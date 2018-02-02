@@ -1,0 +1,10 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - npm install
+      - zip -r thebuild.zip *
+artifacts:
+  files:
+    - thebuild.zip
