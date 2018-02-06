@@ -8,3 +8,4 @@ phases:
 artifacts:
   files:
     - thebuild.zip
+  discard-paths: yes
