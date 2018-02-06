@@ -4,4 +4,8 @@ phases:
   build:
     commands:
       - npm install
+      - zip -r thebuild.zip *
 artifacts:
+  files:
+    - thebuild.zip
+  discard-paths: yes
