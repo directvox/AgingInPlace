@@ -2,7 +2,7 @@
 
 const mainHandlers = {
     'LaunchRequest': function () {
-        this.response.speak('Hello. Welcome to Help Hub, how may I assist you?').listen();
+        this.response.speak('Hello. Welcome to Care Hub, how may I assist you?').listen();
         
         this.emit(':responseReady');
     },

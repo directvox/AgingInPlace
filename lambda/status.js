@@ -2,7 +2,7 @@
 
 const statusHandlers = {
     'PositiveIntent': function () {
-        const cardTitle = 'Help Hub: Positive Status';
+        const cardTitle = 'Care Hub: Positive Status';
         const speechOutput = 'Hurray! Glad to hear that Susan arrived on time!';
         const cardContent = 'Hurray! Glad to hear that Susan arrived on time!';
         
@@ -15,7 +15,7 @@ const statusHandlers = {
     },
     
     'NegativeIntent': function () {
-        const cardTitle = 'Help Hub: Negative Status';
+        const cardTitle = 'Care Hub: Negative Status';
         const speechOutput = 'Shame! I have noted that Susan was late today!';
         const cardContent = 'Shame! I have noted that Susan was late today!';
         

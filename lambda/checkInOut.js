@@ -7,7 +7,7 @@ const CHECK_OUT_PRE = "You have successfully checked out at:  ";
 const offset = -8;  //default PST Timezone
 
 const checkHandlers = {
-    'CheckIN': function () {
+    'CheckIn': function () {
         this.emit('DoCheckIN');
     },
 
@@ -16,7 +16,7 @@ const checkHandlers = {
     },
 
     'DoCheckIN': function () {
-        const cardTitle = 'Help Hub: Check In';
+        const cardTitle = 'Care Hub: Check In';
         const d = new Date();
         const utc = d.getTime() + (d.getTimezoneOffset() *60000);
         checkInDateTime = new Date(utc + (3600000*offset));
@@ -28,7 +28,7 @@ const checkHandlers = {
     },
 
     'DoCheckOut': function () {
-        const cardTitle = 'Help Hub: Check Out';
+        const cardTitle = 'Care Hub: Check Out';
         const d = new Date();
         const utc = d.getTime() + (d.getTimezoneOffset() *60000);
         checkOutDateTime = new Date(utc + (3600000*offset));

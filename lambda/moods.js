@@ -17,7 +17,7 @@ const moodHandlers = {
       this.emit("Thank you for your input! Your contribute has been added to the greater good of Humanity, Please take your happy pills"); 
     },
     'HappyTestIntent': function() {
-        const cardTitle = 'Help Hub: Moods';
+        const cardTitle = 'Care Hub: Moods';
         const speechOutput = "Gloria is feeling happy as of 1:30pm Wednesday";
         const cardContent = 'Gloria is feeling happy as of 1:30pm Wednesday';
         const imageObj = {
@@ -27,7 +27,7 @@ const moodHandlers = {
         this.emit(':tellWithCard', speechOutput, cardTitle, cardContent, imageObj);
     },
     'NeutralTestIntent': function() {
-        const cardTitle = 'Help Hub: Moods';
+        const cardTitle = 'Care Hub: Moods';
         const speechOutput = "Gloria is feeling neutral as of 1:30pm Wednesday";
         const cardContent = 'Gloria is feeling neutral as of 1:30pm Wednesday';
         const imageObj = {
@@ -37,7 +37,7 @@ const moodHandlers = {
         this.emit(':tellWithCard', speechOutput, cardTitle, cardContent, imageObj);
     },
     'SadTestIntent': function () {
-        const cardTitle = 'Help Hub: Moods';
+        const cardTitle = 'Care Hub: Moods';
         const speechOutput = "Gloria is feeling sad as of 1:30pm Wednesday";
         const cardContent = 'Gloria is feeling sad as of 1:30pm Wednesday';
         const imageObj = {
