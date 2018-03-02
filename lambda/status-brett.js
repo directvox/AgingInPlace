@@ -1,6 +1,6 @@
 'use strict';
 
-var testing = 'brettplease';
+var testing = '';
 
 const pg = require("pg");
 const config = require('./config');
@@ -44,27 +44,20 @@ const statusHandlers = {
     
     'KSeniorCheckIntent': function () {
         const self = this;
-        
-        pool.connect((err, client, release) => {
-            if (err) {
-              return console.error('Error acquiring client', err.stack);
-            }
-            client.query("SELECT * FROM caregivers", (err, result) => {
-                release();
-                if (err) {
-                    return console.error('Error executing query', err.stack);
-                }
+        pool.connect().then(client => {
+            client.query("SELECT * FROM caregivers").then(result => {
+                client.release();
                 console.log('Rows: ' + result.rows);
-                
+
                 testing = result.rows[0].organization;
                 console.log('Testing: ' + testing);
-                
+
                 const cardTitle = 'Care Hub: Senior Check Week';
-                
+
                 var speechOutput = testing;
                 console.log(typeof speechOutput);
-                
-                const cardContent = testing;
+
+                const cardContent = 'Test';
 
                 const imageObj = {
                     smallImageUrl: 'https://i.imgur.com/pQ8wWLj.png',
@@ -72,7 +65,13 @@ const statusHandlers = {
                 };
 
                 self.emit(':tellWithCard', speechOutput, cardTitle, cardContent, imageObj);
-            })
+            }).catch((err) => {
+                client.release();
+                console.log(err.stack);
+            });
+        }).catch((err) => {
+            client.release();
+            console.log(err.stack);
         });
     }
 };
