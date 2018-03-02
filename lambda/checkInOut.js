@@ -1,5 +1,6 @@
 'use strict';
 
+
 var checkInDateTime;
 var checkOutDateTime;
 const CHECK_IN_PRE = "You have successfully checked in at:  ";
@@ -18,6 +19,7 @@ const checkHandlers = {
     'DoCheckIN': function () {
         const cardTitle = 'Care Hub: Check In';
         const d = new Date();
+
         const utc = d.getTime() + (d.getTimezoneOffset() *60000);
         checkInDateTime = new Date(utc + (3600000*offset));
         const checkInDateString = checkInDateTime.toString().slice(0,21);  //only first 21 characters of date
