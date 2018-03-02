@@ -2,6 +2,7 @@
 
 //packages
 const Alexa = require('alexa-sdk');
+const pg = require("pg");
 
 //imports
 const config = require('./lambda/config');
@@ -14,6 +15,13 @@ const statusHandlers = require("./lambda/status");
 exports.handler = function(event, context, callback) {
     const alexa = Alexa.handler(event, context, callback);
     alexa.appId = config.appId;
+    const pool = new pg.Pool({
+        user: config.dbUSER,
+        password: config.dbPWD,
+        database: config.dbDatabase,
+        host: config.dbURL,
+        port: config.dbPort
+    });
     alexa.registerHandlers(mainHandlers, checkHandlers, moodHandlers, statusHandlers);
     alexa.execute();
 };

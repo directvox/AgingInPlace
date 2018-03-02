@@ -62,3 +62,6 @@ typings/
 
 # VScode
 .vscode
+
+#Jet Brains stuff
+.idea

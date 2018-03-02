@@ -1,7 +1,7 @@
 {
   "name": "aginginplace",
   "version": "1.0.0",
-  "description": "Alex Skill to help Seniors.",
+  "description": "Alexa Skill to help Seniors.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/AlexaIsGreat/AgingInPlace#readme",
   "dependencies": {
-    "alexa-sdk": "^1.0.25"
+    "alexa-sdk": "^1.0.25",
+    "pg": "^7.4.1"
   }
 }
