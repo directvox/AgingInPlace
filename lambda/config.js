@@ -1,8 +1,9 @@
-let config = {
-    appId : 'amzn1.ask.skill.4dd68f44-71f1-4a22-8891-8bfe7aa4b719',
-    dbURL : '',
-    dbUSER : '',
-    dbPWD : '',
+const config = {
+    appId :  process.env.APP_ID,
+    dbURL :  process.env.DB_HOST,
+    dbDatabase : process.env.DB_DATABASE,
+    dbUSER :  process.env.DB_USER,
+    dbPWD :  process.env.DB_PASS,
     dbPort : 5432
 };
 
