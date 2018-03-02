@@ -1,35 +1,43 @@
 'use strict';
 
 const moodHandlers = {
-    'HelloWorldIntent': function () {
-        this.emit('SayHello');
-    },
-    'SayHello': function () {
-        this.response.speak('Hello World!');
-        this.emit(':responseReady');
-    },
     'InputMoodIntent': function() {
         this.response.speak("How are you feeling today?").listen("How are you feeling today?");
         
         this.emit(':responseReady');
     },
     'InputCompleteIntent': function () {
-      this.emit("Thank you for your input! Your contribute has been added to the greater good of Humanity, Please take your happy pills"); 
+
+        var mood = 
+        pool.connect((err, client, release) => {
+            client.query("INSERT INTO moods (value, whenwasit, id_num) VALUES ('$1', NOW(), '2')", [mood], (err, result) => {
+                release()
+                if (err) {
+                  return console.error('Error executing query', err.stack)
+                }
+                console.log(result.rows)
+                this.emit("Thank you for your input! Your contribute has been added to the greater good of Humanity, Please take your happy pills");
+              })
+        });
+
+       
     },
     'HappyTestIntent': function() {
         const cardTitle = 'Care Hub: Moods';
-        const speechOutput = "Gloria is feeling happy as of 1:30pm Wednesday";
-        const cardContent = 'Gloria is feeling happy as of 1:30pm Wednesday';
+        const speechOutput = "Sally is feeling happy as of 1:30pm Wednesday";
+        const cardContent = 'Sally is feeling happy as of 1:30pm Wednesday';
         const imageObj = {
         	smallImageUrl: 'https://i.imgur.com/We7OlAD.png',
         	largeImageUrl: 'https://i.imgur.com/We7OlAD.png'
         };
+
+
         this.emit(':tellWithCard', speechOutput, cardTitle, cardContent, imageObj);
     },
     'NeutralTestIntent': function() {
         const cardTitle = 'Care Hub: Moods';
-        const speechOutput = "Gloria is feeling neutral as of 1:30pm Wednesday";
-        const cardContent = 'Gloria is feeling neutral as of 1:30pm Wednesday';
+        const speechOutput = "Sally is feeling neutral as of 1:30pm Wednesday";
+        const cardContent = 'Sally is feeling neutral as of 1:30pm Wednesday';
         const imageObj = {
         	smallImageUrl: 'https://i.imgur.com/0de3NQz.png',
         	largeImageUrl: 'https://i.imgur.com/0de3NQz.png'
@@ -38,8 +46,8 @@ const moodHandlers = {
     },
     'SadTestIntent': function () {
         const cardTitle = 'Care Hub: Moods';
-        const speechOutput = "Gloria is feeling sad as of 1:30pm Wednesday";
-        const cardContent = 'Gloria is feeling sad as of 1:30pm Wednesday';
+        const speechOutput = "Sally is feeling sad as of 1:30pm Wednesday";
+        const cardContent = 'Sally is feeling sad as of 1:30pm Wednesday';
         const imageObj = {
         	smallImageUrl: 'https://i.imgur.com/w0YWq8n.png',
         	largeImageUrl: 'https://i.imgur.com/w0YWq8n.png'
