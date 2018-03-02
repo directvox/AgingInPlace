@@ -23,6 +23,6 @@ exports.handler = function(event, context, callback) {
         port: config.dbPort
     });
     context.callbackWaitsForEmptyEventLoop = false;
-    alexa.registerHandlers(mainHandlers, checkHandlers, moodHandlers, statusHandlers);
+    alexa.registerHandlers(mainHandlers, checkHandlers, moodHandlers, statusHandlers, creatingHandlers);
     alexa.execute();
 };
