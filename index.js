@@ -10,6 +10,7 @@ const mainHandlers = require('./lambda/main');
 const checkHandlers = require("./lambda/checkInOut");
 const moodHandlers = require("./lambda/moods");
 const statusHandlers = require("./lambda/status");
+const creatingHandlers = require("./lambda/createRole");
 
 //handler
 exports.handler = function(event, context, callback) {
