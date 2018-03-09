@@ -40,7 +40,7 @@ const statusHandlers = {
         self.emit(':tellWithCard', speechOutput, cardTitle, cardContent, imageObj);
     },
     
-    'KSeniorCheckIntent': function () {
+    'KReportIntent': function () {
         const self = this;
         
         var senior_id_num = '';
@@ -80,8 +80,8 @@ const statusHandlers = {
                     const cardContent = 'The most recent mood expressed by the Senior is ' + senior_mood_value;
 
                     const imageObj = {
-                        smallImageUrl: 'http://bit.ly/2ttwpXV',
-                        largeImageUrl: 'http://bit.ly/2ttwpXV'
+                        smallImageUrl: 'https://bit.ly/2ttwpXV',
+                        largeImageUrl: 'https://bit.ly/2ttwpXV'
                     };
 
                     self.emit(':tellWithCard', speechOutput, cardTitle, cardContent, imageObj);
