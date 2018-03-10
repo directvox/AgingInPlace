@@ -2,6 +2,7 @@
 
 const pg = require("pg");
 const config = require('./config');
+const moment = require('moment');
 
 const pool = new pg.Pool({
     user: config.dbUSER,
@@ -44,7 +45,10 @@ const statusHandlers = {
         const self = this;
         
         var senior_id_num = '';
-        var senior_mood_value = '';
+        var mood_value = '';
+        var mood_when_was_it = '';
+        var mood_when_was_it_moment = '';        
+        var mood_when_was_it_alexa = '';
         
         pool.connect((err, client, release) => {
             if (err) {
@@ -60,7 +64,7 @@ const statusHandlers = {
                 senior_id_num = result.rows[0].id_num;
                 console.log('ID Num: ' + senior_id_num);
                 
-                client.query("SELECT value FROM moods WHERE id_num = ($1)", [senior_id_num], (err, result) => {
+                client.query("SELECT * FROM moods WHERE id_num = ($1)", [senior_id_num], (err, result) => {
                     release();
 
                     if (err) {
@@ -69,15 +73,24 @@ const statusHandlers = {
 
                     console.log('Reading Mood of: ' + senior_id_num);
                     console.log('MOODS Result Rows: ' + result.rows);
-                    senior_mood_value = result.rows[0].value;
-                    console.log('Mood Value: ' + senior_mood_value);
+                    mood_value = result.rows[0].value;
+                    mood_when_was_it = result.rows[0].whenwasit;
+                    console.log('Mood Value: ' + mood_value);
+                    console.log('Mood Time TIMESTAMP: ' + mood_when_was_it);
+                    
+                    // 2018-01-09 14:50:00
+                    mood_when_was_it_moment = moment(mood_when_was_it).format("YYYY-MM-DD HH:mm:ss");
+                    console.log('Mood Time STRING: ' + mood_when_was_it_moment);
+//                    console.log('Mood Time STRING type: ' + typeof mood_when_was_it_moment);
+                    
+                    mood_when_was_it_alexa = moment(mood_when_was_it_moment).format('MMM Do YYYY hh:mmA');
 
                     const cardTitle = 'Care Hub: Status Report';
 
                     var speechOutput = 'Please check your Alexa app for the Status Report!';
-                    console.log(typeof speechOutput);
+//                    console.log('Type of Speech Output ' + typeof speechOutput);
 
-                    const cardContent = 'The most recent mood expressed by the Senior is ' + senior_mood_value;
+                    const cardContent = 'On ' + mood_when_was_it_alexa + ', ' + 'the most recent mood expressed was: ' + mood_value;
 
                     const imageObj = {
                         smallImageUrl: 'https://bit.ly/2ttwpXV',
