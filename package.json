@@ -1,7 +1,7 @@
 {
   "name": "aginginplace",
   "version": "1.0.0",
-  "description": "Alex Skill to help Seniors.",
+  "description": "Alexa Skill to help Seniors.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,13 +19,17 @@
     "Wham",
     "Wazzle"
   ],
-  "author": "Brett Dixon, Alex Christensen, Daniel Kole, Kelvin Lau",
+  "author": "Brett Dixon, Alex Christensen, Daniel Kole, Kelvin Lau, Abraham Al Jundi",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/AlexaIsGreat/AgingInPlace/issues"
   },
   "homepage": "https://github.com/AlexaIsGreat/AgingInPlace#readme",
   "dependencies": {
-    "alexa-sdk": "^1.0.25"
+    "alexa-sdk": "^1.0.25",
+    "axios": "^0.18.0",
+    "moment": "^2.21.0",
+    "moment-timezone": "^0.5.14",
+    "pg": "^7.4.1"
   }
 }

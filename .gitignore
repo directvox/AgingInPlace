@@ -1,6 +1,12 @@
 # macOS
 *.DS_Store
 
+# Workbench-Build123
+Workbench-Build123/*
+
+# .zips
+*.zip
+
 # Logs
 logs
 *.log
@@ -62,3 +68,6 @@ typings/
 
 # VScode
 .vscode
+
+#Jet Brains stuff
+.idea
