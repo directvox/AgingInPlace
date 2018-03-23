@@ -1,6 +1,7 @@
 'use strict';
 var token = "";
 var userID = "";
+var testRes = true;
 
 const pg = require("pg");
 const config = require('./config');
