@@ -19,16 +19,22 @@ const moodHandlers = {
     },
     'InputCompleteIntent': function () {
 
-        var mood = "happy";
+        const intentObj = this.event.request.intent;
+        var moodVal = intentObj.slots.mood.value;
+        console.log(moodVal)
+
+        var self = this;
+        //REMOVE usrID WHEN WE HAVE USERS WORKING :D
         var usrID = "abcdefghijklmnopqrstuvwxyz0123456789";
         pool.connect((err, client, release) => {
-            client.query("INSERT INTO moods (value, whenwasit, id_num) VALUES ($1, NOW(), $2)", [mood, usrID], (err, result) => {
-                client.release();
+            client.query("INSERT INTO moods (value, whenwasit, id_num) VALUES ($1, NOW(), $2)", [moodVal, usrID], (err, result) => {
+                release();
                 if (err) {
                   return console.error('Error executing query', err.stack)
                 }
-                //console.log(result.rows)
-                this.emit("Thank you for your input! Your contribute has been added to the greater good of Humanity, Please take your happy pills");
+                console.log("Test that it works")
+                self.response.speak("Thank you for your input! Your contribute has been added to the greater good of Humanity, Please take your happy pills");
+                self.emit(':responseReady');
               })
         });
 
