@@ -1,5 +1,14 @@
 'use strict';
 
+
+const pool = new pg.Pool({
+    user: config.dbUSER,
+    password: config.dbPWD,
+    database: config.dbDatabase,
+    host: config.dbURL,
+    port: config.dbPort
+});
+
 const moodHandlers = {
     'InputMoodIntent': function() {
         this.response.speak("How are you feeling today?").listen("How are you feeling today?");
@@ -11,7 +20,7 @@ const moodHandlers = {
         var mood = "happy";
         pool.connect((err, client, release) => {
             client.query("INSERT INTO moods (value, whenwasit, id_num) VALUES ('$1', NOW(), '2')", [mood], (err, result) => {
-                release()
+                release();
                 if (err) {
                   return console.error('Error executing query', err.stack)
                 }
