@@ -12,35 +12,7 @@ const pool = new pg.Pool({
     port: config.dbPort
 });
 
-const statusHandlers = {
-    'KPositiveIntent': function () {
-        const cardTitle = 'Care Hub: Positive Status';
-        const speechOutput = 'Hurray! Glad to hear that Susan arrived on time!';
-        const cardContent = 'Hurray! Glad to hear that Susan arrived on time!';
-        
-        const imageObj = {
-        	smallImageUrl: 'https://i.imgur.com/7ZR0GPp.jpg',
-        	largeImageUrl: 'https://i.imgur.com/7ZR0GPp.jpg'
-        };
-        
-        this.emit(':tellWithCard', speechOutput, cardTitle, cardContent, imageObj);
-    },
-    
-    'KNegativeIntent': function () {
-        const self = this;
-        
-        const cardTitle = 'Care Hub: Negative Status';
-        const speechOutput = 'Shame! I have noted that Susan was late today!';
-        const cardContent = 'Shame! I have noted that Susan was late today!';
-        
-        const imageObj = {
-        	smallImageUrl: 'https://i.imgur.com/pQ8wWLj.png',
-        	largeImageUrl: 'https://i.imgur.com/pQ8wWLj.png'
-        };
-        
-        self.emit(':tellWithCard', speechOutput, cardTitle, cardContent, imageObj);
-    },
-    
+const statusHandlers = {    
     'KReportIntent': function () {
         // Professional Caregiver (caregivers) = event.session.user.userId / care_id = amzn1... 
         
@@ -63,25 +35,41 @@ const statusHandlers = {
                 console.log('SENIORS Result Row: ' + result.rows);
                 var senior_id_num = result.rows[0].id_num;
                 console.log('ID Num: ' + senior_id_num);
-                
-                client.query("SELECT * FROM moods WHERE id_num = ($1)", [senior_id_num], (err, result) => {
+                                
+                client.query("SELECT * from moods WHERE id_num = ($1) ORDER BY whenwasit DESC LIMIT 5;", [senior_id_num], (err, result) => {
                     if (err) {
                         return console.error('Error executing query', err.stack);
                     }
 
                     console.log('Reading Mood of: ' + senior_id_num);
                     console.log('MOODS Result Rows: ' + result.rows);
-                    var mood_value = result.rows[0].value;
-                    var mood_when_was_it = result.rows[0].whenwasit;
-                    console.log('Mood Value: ' + mood_value);
-                    console.log('Mood Time TIMESTAMP: ' + mood_when_was_it);
+                    var mood_value_0 = result.rows[0].value;                    
+                    var mood_value_1 = result.rows[1].value;
+                    var mood_value_2 = result.rows[2].value;
+                    var mood_value_3 = result.rows[3].value;
+                    var mood_value_4 = result.rows[4].value;
+
+                    console.log('Mood Values: ' + mood_value_0 + mood_value_1 + mood_value_2 + mood_value_3 + mood_value_4);
+                    
+                    var mood_when_was_it_0 = result.rows[0].whenwasit;
+                    var mood_when_was_it_1 = result.rows[1].whenwasit;
+                    var mood_when_was_it_2 = result.rows[2].whenwasit;
+                    var mood_when_was_it_3 = result.rows[3].whenwasit;
+                    var mood_when_was_it_4 = result.rows[4].whenwasit;
+
+                    console.log('Mood Time TIMESTAMP: ' + mood_when_was_it_0 + mood_when_was_it_1 + mood_when_was_it_2 + mood_when_was_it_3 + mood_when_was_it_4);
                     
                     // 2018-01-09 14:50:00
-                    var mood_when_was_it_moment = moment(mood_when_was_it).format("YYYY-MM-DD HH:mm:ss");
-                    console.log('Mood Time STRING: ' + mood_when_was_it_moment);
+                    var mood_when_was_it_moment_0 = moment(mood_when_was_it_0).format("YYYY-MM-DD HH:mm:ss");               
+                    var mood_when_was_it_moment_1 = moment(mood_when_was_it_1).format("YYYY-MM-DD HH:mm:ss");               
+                    var mood_when_was_it_moment_2 = moment(mood_when_was_it_2).format("YYYY-MM-DD HH:mm:ss");              
+                    var mood_when_was_it_moment_3 = moment(mood_when_was_it_3).format("YYYY-MM-DD HH:mm:ss");              
+                    var mood_when_was_it_moment_4 = moment(mood_when_was_it_4).format("YYYY-MM-DD HH:mm:ss");
+                    
+                    console.log('Mood Time STRING: ' + mood_when_was_it_moment_0 + mood_when_was_it_moment_1 + mood_when_was_it_moment_2 + mood_when_was_it_moment_3 + mood_when_was_it_moment_4);
 //                    console.log('Mood Time STRING type: ' + typeof mood_when_was_it_moment);
                     
-                    var mood_when_was_it_alexa = moment(mood_when_was_it_moment).format('MMM Do YYYY hh:mmA');
+                    var mood_when_was_it_alexa_0 = moment(mood_when_was_it_moment_0).format('MMM Do YYYY hh:mmA');         var mood_when_was_it_alexa_1 = moment(mood_when_was_it_moment_1).format('MMM Do YYYY hh:mmA');         var mood_when_was_it_alexa_2 = moment(mood_when_was_it_moment_2).format('MMM Do YYYY hh:mmA');         var mood_when_was_it_alexa_3 = moment(mood_when_was_it_moment_3).format('MMM Do YYYY hh:mmA');         var mood_when_was_it_alexa_4 = moment(mood_when_was_it_moment_4).format('MMM Do YYYY hh:mmA');
                     
                     client.query("SELECT * FROM checkins WHERE id_num = ($1)", [senior_id_num], (err, result) => {
                         release();
@@ -102,8 +90,8 @@ const statusHandlers = {
                         var checkins_check_out_moment = moment(checkins_check_out).format("YYYY-MM-DD HH:mm:ss");
                         console.log('Check-Out STRING: ' + checkins_check_out_moment);
 
-                         var checkins_check_in_alexa = moment(checkins_check_in_moment).format('MMM Do YYYY hh:mmA');
-                         var checkins_check_out_alexa = moment(checkins_check_out_moment).format('MMM Do YYYY hh:mmA');
+                        var checkins_check_in_alexa = moment(checkins_check_in_moment).format('MMM Do YYYY hh:mmA');
+                        var checkins_check_out_alexa = moment(checkins_check_out_moment).format('MMM Do YYYY hh:mmA');
 
                         const cardTitle = 'Care Hub: Status Report';
 
@@ -111,10 +99,15 @@ const statusHandlers = {
     //                    console.log('Type of Speech Output ' + typeof speechOutput);
 
                         const cardContent = 
-                              'Moods...' + '\n' + 
-                              'On ' + mood_when_was_it_alexa + ', ' + 'the Senior expressed the mood: ' + mood_value + '\n' + '\n' + 
-                              'Check-In...' + '\n' +
-                              'The Caregiver checked-in at: ' + checkins_check_in_alexa + ', and checked-out at: ' + checkins_check_out_alexa;
+                            'Moods...' + '\n' + 
+                            'On ' + mood_when_was_it_alexa_0 + ', ' + 'the Senior expressed the mood: ' + mood_value_0 + '\n' + '\n' + 
+                            'On ' + mood_when_was_it_alexa_1 + ', ' + 'the Senior expressed the mood: ' + mood_value_1 + '\n' + '\n' + 
+                            'On ' + mood_when_was_it_alexa_2 + ', ' + 'the Senior expressed the mood: ' + mood_value_2 + '\n' + '\n' + 
+                            'On ' + mood_when_was_it_alexa_3 + ', ' + 'the Senior expressed the mood: ' + mood_value_3 + '\n' + '\n' + 
+                            'On ' + mood_when_was_it_alexa_4 + ', ' + 'the Senior expressed the mood: ' + mood_value_4 + '\n' + '\n' + 
+                              
+                            'Check-In...' + '\n' +
+                            'The Caregiver checked-in at: ' + checkins_check_in_alexa + ', and checked-out at: ' + checkins_check_out_alexa;
 
                         const imageObj = {
                             smallImageUrl: 'https://bit.ly/2ttwpXV',
