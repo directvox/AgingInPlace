@@ -26,7 +26,7 @@ const creatingHandlers = {
         this.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContnet);
     } else {
         this.emit('CreateRole')
-    }
+        }
     },
     'CreateRole': function () {
         var self = this;
