@@ -1,5 +1,6 @@
 'use strict';
 var token = "";
+var userID = "";
 
 const pg = require("pg");
 const config = require('./config');
@@ -16,15 +17,16 @@ const creatingHandlers = {
 
   'ConfirmCreate': function () {
     const intentObj = this.event.request.intent;
+    userID = this.event.session.user.userId;
     if(intentObj.confirmationStatus !== 'CONFIRMED'){
-        const speechOutput = 'You want to setup senior account?';
+        const speechOutput = 'Are you sure you want to setup senior account?';
         const cardTitle = 'Setup Senior Confirmation';
-        const cardContnet = 'You want to setup senior account?'
+        const cardContnet = 'Are you sure you want to setup senior account?'
         const repromptSpeech = speechOutput;
         this.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContnet);
     } else {
         this.emit('CreateRole')
-    }
+        }
     },
     'CreateRole': function () {
         var self = this;
