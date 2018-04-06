@@ -100,10 +100,6 @@ const creatingHandlers = {
                                 .then(result => {
                                     client.release();
                                     console.log("Token success: "+ token);
-
-                                    var cardTitle = "Thank you for updating your Mood!";
-                                var cardContent = "Your mood is " + moodText;
-                                var cardImg = imageChooser(moodVal); 
                                     self.emit(':tellWithCard', 'Senior setup has been completed. Please look at the alexa app to see your caregiver code.', 'Ccode Value', "This is your the caregiver code: "+token.split('').join('. '));
                                     testRes = false;
                                 }).catch(err => {
