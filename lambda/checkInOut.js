@@ -113,18 +113,18 @@ const checkHandlers = {
         var sid = 0;  //serial id of the check in/out instance
         const cardTitle = 'Care Hub: Check Out';
         console.log("userID: "+ userID);
-        pool.connect().then(client => {
         serviceName = intentObj.slots.Service.value.toUpperCase();
+        pool.connect().then(client => {
             return client.query("SELECT * FROM senior_check_view WHERE service_name = $1 AND id_num= $2 ORDER BY serial_id DESC", [serviceName, userID])
             .then(result => {
                 if (result.rows.length > 0){ //checking to see if any check_ins happened with that service name.
                     checkOutDateTime = moment();
                     var duration = moment.duration(checkOutDateTime.diff(checkInDateTime));
                     var mins = Math.ceil(duration.asMinutes());  //rounding duration of service up.
+                    checkInDateTime = moment(result.rows[0].check_in); 
                     if (result.rows[0].check_out == null){   //checking to see a check out hasn't already been performed.
                         console.log("results: "+ result.rows[0].timezone);
-                        sid = result.rows[0].serial_id;
-                        checkInDateTime = moment(result.rows[0].check_in);  
+                        sid = result.rows[0].serial_id; 
                         timeZoneId = result.rows[0].timezone;
                         console.log("Timezone:  "+ timeZoneId);
                         return client.query("UPDATE checkins SET check_out = $1, duration = $2 WHERE serial_id = $3", [checkOutDateTime, mins, sid])
