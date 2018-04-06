@@ -33,7 +33,7 @@ const moodHandlers = {
         var moodText = intentObj.slots.mood.value;
 
         pool.connect().then(client => {
-            return client.query("SELECT * FROM seniors WHERE id_num = $1", [this.event.session.user.userId])
+            return client.query("SELECT * FROM seniors WHERE id_num = $1", [usrID])
             .then(result => {
                 if (result.rows[0]){
                     if(intentObj.confirmationStatus !== 'CONFIRMED'){
@@ -60,7 +60,7 @@ const moodHandlers = {
                         });
                     }
                 } else {
-                    self.response.speak('It appears that Senior Setup has not been run on this device yet.  Please do so before trying to Check In or Out.');
+                    self.response.speak('It appears that Senior Setup has not been run on this device yet.  Please do so before trying to Input your mood.');
                     self.emit(':responseReady');
                 }
             }).catch(err => {
