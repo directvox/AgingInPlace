@@ -88,19 +88,19 @@ const creatingHandlers = {
             .then(result => {
                 console.log(testRes);
                 if(findID(result, userID)) {
-                    self.emit(':tellWithCard', 'Senior setup already been ran on this device. Please look at the alexa app to see your caregiver code.', 'Ccode Value', "This is your the caregiver code: "+token.split('').join('. '));
+                    self.emit(':tellWithCard', 'Senior setup has already been run on this device. Please look at the alexa app to see your caregiver code.', 'Ccode Value', "This is your the caregiver code: " + token);
                 } else {
                     while(testRes){
                         if(findCC(result, token)){
                             console.log("was a truey");
-                            token = randomInt().toString(36);  //base36 characters.
+                            token = randomInt();
                             console.log("token: "+ token);
                         } else {                                                                             
                             return client.query("INSERT INTO seniors (id_num, timezone, ccode) VALUES ($1, $2, $3)",[userID, timeZoneId, token])
                                 .then(result => {
                                     client.release();
                                     console.log("Token success: "+ token);
-                                    self.emit(':tellWithCard', 'Senior setup has been completed. Please look at the alexa app to see your caregiver code.', 'Ccode Value', "This is your the caregiver code: "+token.split('').join('. '));
+                                    self.emit(':tellWithCard', 'Senior setup has been completed. Please look at the alexa app to see your caregiver code.', 'Ccode Value', "This is your the caregiver code: "+token);
                                     testRes = false;
                                 }).catch(err => {
                                     console.log(err.stack);
@@ -116,8 +116,13 @@ const creatingHandlers = {
     }
 };
 
-function randomInt () {  //returns pseudo-random number between 0 and 36^6-1;
-return Math.round(Math.random() * (Math.pow(36,6)-1));
+function randomInt () { 
+    var number = parseInt(Math.random()*1e9, 10)
+    var str = '' + number;
+    while (str.length < 9) {
+        str = '0' + str;
+    }
+    return str;
 }
 
 function findID (input, userID) {
