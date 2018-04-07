@@ -12,6 +12,7 @@ var deviceId = '';
 var apiEndpoint = '';
 var googleMapApiUrl1 = '';
 var googleMapApiUrl2 = '';
+var intentObj;
 
 
 const pg = require("pg");
@@ -39,7 +40,7 @@ const creatingHandlers = {
 
   'ConfirmCreate': function () {
       var self = this;
-      const intentObj = this.event.request.intent;
+      intentObj = this.event.request.intent;
       userID = this.event.session.user.userId;
       consentToken = self.event.context.System.apiAccessToken;
       if(!consentToken) {
@@ -61,9 +62,10 @@ const creatingHandlers = {
         switch(addressResponse.statusCode) {
             case 200:
                 console.log("Address successfully retrieved, now responding to user.");
-                countryCode = addressResponse.countryCode;
+                countryCode = addressResponse.address.countryCode;
                 console.log("Country Code: ", countryCode);
-                postalCode = addressResponse.postalCode;
+                postalCode = addressResponse.address.postalCode;
+                console.log("Postal Code: ", postalCode);
 
                 self.emit('GetTimeZone');
                 break;
