@@ -9,17 +9,24 @@ var lng = 0;
 var timeZoneId = '';
 var consentToken = '';
 var deviceId = '';
-var apiEndPoint = '';
+var apiEndpoint = '';
 var googleMapApiUrl1 = '';
 var googleMapApiUrl2 = '';
+var intentObj;
 
 
 const pg = require("pg");
 const config = require('./config');
-const Alexa = require('alexa-sdk');
-const das = new Alexa.services.DeviceAddressService();
 const axios = require('axios');
 const moment = require('moment-timezone');
+const AlexaDeviceAddressClient = require('./AlexaDeviceAddressClient');
+
+const ADDRESS_PERMISSION = "read::alexa:device:all:address:country_and_postal_code";  //Only assk for Country and PostalCode
+const NOTIFY_MISSING_PERMISSIONS = "Please enable Location permissions in the Amazon Alexa app.";
+const NO_ADDRESS = "It looks like you don't have an address set. You can set your address from the companion app.";
+const LOCATION_FAILURE = "There was an error retrieving your location. Please try Setup Senior again.";
+const ERROR = "Uh Oh. Looks like something went wrong.";
+const PERMISSIONS = [ADDRESS_PERMISSION];
 
 const pool = new pg.Pool({
     user: config.dbUSER,
@@ -33,52 +40,91 @@ const creatingHandlers = {
 
   'ConfirmCreate': function () {
       var self = this;
-      const intentObj = this.event.request.intent;
+      intentObj = this.event.request.intent;
       userID = this.event.session.user.userId;
       consentToken = self.event.context.System.apiAccessToken;
-      console.log("Consent: ", consentToken);
-      deviceId = self.event.context.System.device.deviceId;
-      apiEndPoint = self.event.context.System.apiEndpoint;
+      if(!consentToken) {
+        self.emit(":tellWithPermissionCard", NOTIFY_MISSING_PERMISSIONS, PERMISSIONS);
 
-      das.getCountryAndPostalCode(deviceId, apiEndPoint, consentToken)
-          .then((response) => {
-          console.log('Response Json:\n', response);
-          countryCode = response.countryCode;
-          console.log("Country Code: ", countryCode);
-          postalCode = response.postalCode;
-          googleMapApiUrl1 = 'https://maps.googleapis.com/maps/api/geocode/json?address='+countryCode+','+postalCode+'&key='+process.env.MAP_KEY;
-          axios.get(googleMapApiUrl1)
-              .then(function(response) {
-                  console.log('Google Api Response Json#1:\n', response);
-                  lat = response.data.results[0].geometry.location.lat;
-                  console.log("lat: ", lat);
-                  lng = response.data.results[0].geometry.location.lng;
-                  googleMapApiUrl2 = 'https://maps.googleapis.com/maps/api/timezone/json?location='+lat+','+lng+'&timestamp='+moment().unix()+'&key='+process.env.TZ_MAP_KEY;
-                  axios.get(googleMapApiUrl2)
-                      .then(function(response){
-                          console.log('Google Api Response Json#2:\n', response);
-                          timeZoneId = response.data.timeZoneId;
-                          console.log("Timezone ID: ", timeZoneId);
-                          const d = new moment();
-                          if(intentObj.confirmationStatus !== 'CONFIRMED'){
-                              const speechOutput = 'Are you sure you want to setup senior account?';
-                              const cardTitle = 'Setup Senior Confirmation';
-                              const cardContnet = 'Are you sure you want to setup senior account?'
-                              const repromptSpeech = speechOutput;
-                              self.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContnet);
-                          } else {
-                              self.emit('CreateRole')
-                          }
-                      }).catch(function(err){console.log(err)});
-              }).catch(function(err){console.log(err)});
+        // Lets terminate early since we can't do anything else.
+        console.log("User did not give us permissions to access their address.");
+        console.info("Ending ConfirmCreate");
+        return;
+      }
+
+
+      deviceId = self.event.context.System.device.deviceId;
+      apiEndpoint = self.event.context.System.apiEndpoint;
+      const alexaDeviceAddressClient = new AlexaDeviceAddressClient(apiEndpoint, deviceId, consentToken);
+      let deviceAddressRequest = alexaDeviceAddressClient.getCountryAndPostalCode();
+
+      deviceAddressRequest.then((addressResponse) => {
+        switch(addressResponse.statusCode) {
+            case 200:
+                console.log("Address successfully retrieved, now responding to user.");
+                countryCode = addressResponse.address.countryCode;
+                console.log("Country Code: ", countryCode);
+                postalCode = addressResponse.address.postalCode;
+                console.log("Postal Code: ", postalCode);
+
+                self.emit('GetTimeZone');
+                break;
+            case 204:
+                // This likely means that the user didn't have their address set via the companion app.
+                console.log("Successfully requested from the device address API, but no address was returned.");
+                self.emit(":tell", NO_ADDRESS);
+                break;
+            case 403:
+                console.log("The consent token we had wasn't authorized to access the user's address.");
+                self.emit(":tellWithPermissionCard", NOTIFY_MISSING_PERMISSIONS, PERMISSIONS);
+                break;
+            default:
+                self.emit(":ask", LOCATION_FAILURE, LOCATION_FAILURE);
+        }
       }).catch((error) => {
-              this.response.speak('I\'m sorry. Something went wrong.');
-          this.emit(':responseReady');
-          console.log(error.message);
+        self.emit(":tell", ERROR);
+        console.error(error);
       });
 
-
+    //   deviceAddressRequest.catch((error) => {
+    //         self.emit(":tell", ERROR);
+    //         console.error(error);
+    //   });
     },
+
+    'GetTimeZone': function() {
+        var self = this;
+        googleMapApiUrl1 = 'https://maps.googleapis.com/maps/api/geocode/json?address='+countryCode+','+postalCode+'&key='+process.env.MAP_KEY;
+        axios.get(googleMapApiUrl1)
+            .then(function(response) {
+                console.log('Google Api Response Json#1:\n', response);
+                lat = response.data.results[0].geometry.location.lat;
+                console.log("lat: ", lat);
+                lng = response.data.results[0].geometry.location.lng;
+                googleMapApiUrl2 = 'https://maps.googleapis.com/maps/api/timezone/json?location='+lat+','+lng+'&timestamp='+moment().unix()+'&key='+process.env.TZ_MAP_KEY;
+                axios.get(googleMapApiUrl2)
+                    .then(function(response){
+                        console.log('Google Api Response Json#2:\n', response);
+                        timeZoneId = response.data.timeZoneId;
+                        console.log("Timezone ID: ", timeZoneId);
+                        const d = new moment();
+                        if(intentObj.confirmationStatus !== 'CONFIRMED'){
+                            const speechOutput = 'Are you sure you want to setup senior account?';
+                            const cardTitle = 'Setup Senior Confirmation';
+                            const cardContnet = 'Are you sure you want to setup senior account?'
+                            const repromptSpeech = speechOutput;
+                            self.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContnet);
+                        } else {
+                            self.emit('CreateRole')
+                        }
+                    }).catch(function(err){console.log(err)});
+            }).catch((err) => {
+                this.response.speak('I\'m sorry. Something went wrong.');
+            this.emit(':responseReady');
+            console.log(error.message);
+        });
+    },
+
     'CreateRole': function () {
         var self = this;
         console.log("userID: "+ userID);

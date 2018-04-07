@@ -68,3 +68,6 @@ typings/
 
 #Jet Brains stuff
 .idea
+
+#Zip files
+.zip

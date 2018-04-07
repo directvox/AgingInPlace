@@ -30,7 +30,7 @@ const checkHandlers = {
     'CheckIn': function () {
         intentObj = this.event.request.intent;
         userID = this.event.session.user.userId;
-        serviceName = intentObj.slots.Service.value.toUpperCase();
+        serviceName = titleCase(intentObj.slots.Service.value);
         console.log("Service: ", serviceName);
         if (intentObj.confirmationStatus !== 'CONFIRMED') {
             if (intentObj.confirmationStatus !== 'DENIED') {
@@ -40,9 +40,11 @@ const checkHandlers = {
                 const repromptSpeech = speechOutput;
                 this.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle, cardContent);
             } else {
-                this.emit("Okay, no problem.");
+                this.response.speak('Okay, no problem.');
+                this.emit(':responseReady');
             }
         } else {
+            serviceName = titleCase(intentObj.slots.Service.value);
             this.emit('DoCheckIN');
         }
     },
@@ -50,7 +52,7 @@ const checkHandlers = {
     'OutCheck': function () {
         intentObj = this.event.request.intent;
         userID = this.event.session.user.userId;
-        serviceName = intentObj.slots.Service.value.toUpperCase();
+        serviceName = titleCase(intentObj.slots.Service.value);
         console.log("Service: ", serviceName);
         if (intentObj.confirmationStatus !== 'CONFIRMED') {
             if (intentObj.confirmationStatus !== 'DENIED') {
@@ -60,9 +62,11 @@ const checkHandlers = {
                 const repromptSpeech = speechOutput;
                 this.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle, cardContent);
             } else {
-                this.emit("Okay, no problem.");
+                this.response.speak('Okay, no problem.');
+                this.emit(':responseReady');
             }
         } else {
+            serviceName = titleCase(intentObj.slots.Service.value);
             this.emit('DoCheckOut');
         }
     },
@@ -113,7 +117,6 @@ const checkHandlers = {
         var sid = 0;  //serial id of the check in/out instance
         const cardTitle = 'Care Hub: Check Out';
         console.log("userID: "+ userID);
-        serviceName = intentObj.slots.Service.value.toUpperCase();
         pool.connect().then(client => {
             return client.query("SELECT * FROM senior_check_view WHERE service_name = $1 AND id_num= $2 ORDER BY serial_id DESC", [serviceName, userID])
             .then(result => {
@@ -161,5 +164,16 @@ const checkHandlers = {
         });   
     }
 };
+
+//Fucntion below from: https://medium.freecodecamp.org/three-ways-to-title-case-a-sentence-in-javascript-676a9175eb27
+function titleCase(str) {
+    str = str.toLowerCase().split(' ');
+    for (var i = 0; i < str.length; i++) {
+      str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1); 
+    }
+    console.log("New String: ", str);
+    return str.join(' ');
+}
+
 
 module.exports = checkHandlers;
