@@ -30,7 +30,8 @@ const checkHandlers = {
     'CheckIn': function () {
         intentObj = this.event.request.intent;
         userID = this.event.session.user.userId;
-        serviceName = intentObj.slots.Service.value.toUpperCase();
+        serviceName = intentObj.slots.Service.value;
+        toTitleCase(serviceName);
         console.log("Service: ", serviceName);
         if (intentObj.confirmationStatus !== 'CONFIRMED') {
             if (intentObj.confirmationStatus !== 'DENIED') {
@@ -50,7 +51,8 @@ const checkHandlers = {
     'OutCheck': function () {
         intentObj = this.event.request.intent;
         userID = this.event.session.user.userId;
-        serviceName = intentObj.slots.Service.value.toUpperCase();
+        serviceName = intentObj.slots.Service.value;
+        toTitleCase(serviceName);
         console.log("Service: ", serviceName);
         if (intentObj.confirmationStatus !== 'CONFIRMED') {
             if (intentObj.confirmationStatus !== 'DENIED') {
@@ -113,7 +115,8 @@ const checkHandlers = {
         var sid = 0;  //serial id of the check in/out instance
         const cardTitle = 'Care Hub: Check Out';
         console.log("userID: "+ userID);
-        serviceName = intentObj.slots.Service.value.toUpperCase();
+        serviceName = intentObj.slots.Service.value;
+        toTitleCase(serviceName);
         pool.connect().then(client => {
             return client.query("SELECT * FROM senior_check_view WHERE service_name = $1 AND id_num= $2 ORDER BY serial_id DESC", [serviceName, userID])
             .then(result => {
@@ -161,5 +164,10 @@ const checkHandlers = {
         });   
     }
 };
+
+function toTitleCase(str)
+{
+   return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
 
 module.exports = checkHandlers;
