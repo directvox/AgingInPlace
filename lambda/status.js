@@ -12,49 +12,59 @@ const pool = new pg.Pool({
     port: config.dbPort
 });
 
+
+var userID;
+var intentObj;
+var cCode;
+var timeZone;
 var dates = [];  // moments of the 7 dates.
 var datesStrings = [];  // strings of 7 dates.
 
 
-const statusHandlers = {    
+const statusHandlers = {
+    'MultiRelReport': function () {
+        var self = this;
+        userID = this.event.session.user.userId;
+        intentObj = this.event.request.intent;
+        pool.connect().then(client => {
+            return client.query("SELECT * FROM ccode_rel_view WHERE care_id = $1", [userID])
+            .then(result => {
+                if (result.rows.length > 1) {
+
+                } else if (result.rows.length == 1) {
+                    cCode = result.rows[0].ccode;
+                    self.emit('KReportIntent');
+                } else {
+                    self.response.speak('Sorry we did not find any seniors related to your account.  Please run Setup Caregiver.');
+                    self.emit(':responseReady');
+                }
+
+            }).catch(err => {
+                console.log(err.stack);
+                self.response.speak('Sorry there was an error.  Please try again.');
+                self.emit(':responseReady');
+            });
+
+        }).catch(err => {
+            console.log(err.stack);
+            self.response.speak('Sorry there was an error.  Please try again.');
+            self.emit(':responseReady');
+        });
+    },
+    
     'KReportIntent': function () {
-        /* Professional Caregiver (caregivers) - care_id */
-        // - zyxwvutsrqponmlkjihgfedcba9876543210
-        
-        /* Senior (seniors) - id_num */
-        // - event.session.user.userId = amzn1...
-        // - abcdefghijklmnopqrstuvwxyz0123456789
-        // - ccode = what Caregiver tells Alexa to reference that Senior = 96kka9/etc.
-        
-        const self = this;
+        var self = this;
 
         // User ID
-        var userID = this.event.session.user.userId;
+        userID = this.event.session.user.userId;
         console.log('Current userID: ' + userID);
-
-        // Number of days for Status Report
-        var report_days = 7;
-        var day_number = 7;
         
         pool.connect((err, client, release) => {
             if (err) {
                 return console.error('Error acquiring client', err.stack);
             }
             
-            // /* SENIORS */
-            // // Gets all rows in SENIORS table
-            // client.query("SELECT * FROM seniors", (err, result) => {
-            //     if (err) {
-            //         return console.error('Error executing query', err.stack);
-            //     }
-                
-            //     console.log('SENIORS Rows: ' + result.rows);
-                
-            //     /* The ID Num of the Senior */
-            //     var senior_id_num = result.rows[0].id_num;
-                
-                /* MOODS */
-                // Currently hardcoded to match the results of that id_num in MOODS table
+            
                 var senior_id_num = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
                 // Gets all Moods expressed by the Senior in last 7 days
@@ -65,9 +75,9 @@ const statusHandlers = {
 
                     console.log('MOODS Rows Length: ' + result.rows.length);
 
+                    
+                    timeZone = result.rows[0].timezone;
                     createSevenDays();
-
-                    var timeZone = result.rows[0].timezone;
 
                     var mood_when_was_its = [];
                     var mood_values = [];
@@ -77,7 +87,7 @@ const statusHandlers = {
                         var moodsArray = [];
 
                         for (var i = 0; i<result.rows.length; i++) {
-                            var whenwasit = moment(result.rows[i].whenwasit);
+                            var whenwasit = moment(result.rows[i].whenwasit).tz(timeZone);
                             var whenwasitStart = whenwasit.startOf('day');
                             var time = moment(result.rows[i].whenwasit);
                             var moodString = '';
@@ -85,7 +95,7 @@ const statusHandlers = {
                             console.log('Date from DB: ' + whenwasitStart.format('ll'));
                             console.log('Date we are checking with: ' + datesStrings[j]);
                             if (whenwasitStart.isSame(dates[j])) {
-                                timesArray.push(time.tz(timeZone).format('LT'));
+                                timesArray.push(time.format('LT'));
                                 moodString = "Mood Expressed: " + result.rows[i].value + " at ";
                                 moodsArray.push(moodString);
                             }    
@@ -121,12 +131,12 @@ const statusHandlers = {
                             var serviceArray = [];
 
                             for (var i = 0; i<result.rows.length; i++) {
-                                var whenwasit = moment(result.rows[i].check_in);
+                                var whenwasit = moment(result.rows[i].check_in).tz(timeZone);
                                 var whenwasitStart = whenwasit.startOf('day');
                                 var time = moment(result.rows[i].check_in);
                                 var duration = result.rows[i].duration;
                                 var serviceString = '';
-                                var timeString = time.tz(timeZone).format('LT');
+                                var timeString = time.format('LT');
                                 console.log('Date from DB: ' + whenwasitStart.format('ll'));
                                 console.log('Date we are checking with: ' + datesStrings[j]);
                                 if (whenwasitStart.isSame(dates[j])) {
@@ -181,7 +191,7 @@ function createSevenDays(){  // creates the Seven Dates for the report
     var startDate;
 
     for (var i=6; i>=0; i--){
-        date = moment().subtract(i, 'days');
+        date = moment().tz(timeZone).subtract(i, 'days');
         startDate = date.startOf('day');
         dates.push(startDate);
         console.log("The Date is: "+ startDate.format('ll'));
