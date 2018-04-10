@@ -30,7 +30,27 @@ const statusHandlers = {
             return client.query("SELECT * FROM ccode_rel_view WHERE care_id = $1", [userID])
             .then(result => {
                 if (result.rows.length > 1) {
-
+                    if (intentObj.slots.ccode.confirmationStatus !== 'CONFIRMED'){
+                        if (intentObj.slots.ccode.confirmationStatus !== 'DENIED'){
+                            const slotToConfirm = 'ccode';
+                            const speechOutput = "You've told me your code is. "+intentObj.slots.ccode.value.split('').join('. ')+". Is this correct?";
+                            const repromptSpeech = speechOutput;
+                            const cardTitle = "Your caregiver code:";
+                            cCode = intentObj.slots.ccode.value.toString();
+                            const cardContent = code;
+                            console.log("userID: "+ userID);
+                            console.log(intentObj);
+                            console.log(intentObj.slots.ccode.value);
+                            this.emit(':confirmSlotWithCard', slotToConfirm, speechOutput, repromptSpeech, cardTitle, cardContent);
+                        } else {
+                            const speechOutput = 'Please repeat your caregiver code.';
+                            const slotToElicit = 'ccode';
+                            this.emit(':elicitSlot', slotToElicit, speechOutput, speechOutput);
+                        }
+                    } else {
+                        cCode = intentObj.slots.ccode.value.toString();
+                        this.emit('CheckCare')
+                    }
                 } else if (result.rows.length == 1) {
                     cCode = result.rows[0].ccode;
                     self.emit('KReportIntent');
@@ -44,7 +64,6 @@ const statusHandlers = {
                 self.response.speak('Sorry there was an error.  Please try again.');
                 self.emit(':responseReady');
             });
-
         }).catch(err => {
             console.log(err.stack);
             self.response.speak('Sorry there was an error.  Please try again.');
@@ -62,15 +81,25 @@ const statusHandlers = {
         pool.connect((err, client, release) => {
             if (err) {
                 return console.error('Error acquiring client', err.stack);
+                self.response.speak('Sorry there was an error.  Please try again.');
+                self.emit(':responseReady');
             }
             
-            
-                var senior_id_num = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            client.query("SELECT * FROM ccode_rel_view WHERE ccode = $1", [cCode], (err, result) => {
+                if (err) {
+                    return console.error('Error executing query', err.stack);
+                    self.response.speak('Sorry there was an error.  Please try again.');
+                    self.emit(':responseReady');
+                }
+
+                var senior_id_num = result.rows[0].id_num;
 
                 // Gets all Moods expressed by the Senior in last 7 days
                 client.query("SELECT * FROM senior_mood_view WHERE whenwasit > current_date - interval '7 days' and id_num = $1;", [senior_id_num], (err, result) => {
                     if (err) {
                         return console.error('Error executing query', err.stack);
+                        self.response.speak('Sorry there was an error.  Please try again.');
+                        self.emit(':responseReady');
                     }
 
                     console.log('MOODS Rows Length: ' + result.rows.length);
@@ -114,9 +143,7 @@ const statusHandlers = {
                         }
                     }
                     
-                    /* CHECK-INS */
-                    // Currently hardcoded to match the results of that id_num in CHECK-INS table
-                    senior_id_num = 'amzn1.ask.account.AE4QHOD72IHWXLYTFLNTXILK6FDNIZ35LJKMKBBLTG5WB3SMWVXOI3OWLO4QCFG6SXZQ64VCL6DTX5SL6RORGXYTCTYPLOXATHYKGHOOJAD2YSTJLAFYGC3GSCYNJWPFH56LYLDUQ2CAUZ5VGPCF6KJKCZDYMNMIB4FDQ2OGJQDZNPR2NQSXLYL5KTFMTXTQ2GYF3EKLJSKLPFQ';
+                    // senior_id_num = 'amzn1.ask.account.AE4QHOD72IHWXLYTFLNTXILK6FDNIZ35LJKMKBBLTG5WB3SMWVXOI3OWLO4QCFG6SXZQ64VCL6DTX5SL6RORGXYTCTYPLOXATHYKGHOOJAD2YSTJLAFYGC3GSCYNJWPFH56LYLDUQ2CAUZ5VGPCF6KJKCZDYMNMIB4FDQ2OGJQDZNPR2NQSXLYL5KTFMTXTQ2GYF3EKLJSKLPFQ';
 
                     // Gets all Check-Ins expressed by the Senior in last 7 days
                     client.query("SELECT * FROM senior_check_view WHERE check_in > current_date - interval '7 days' and id_num = $1;", [senior_id_num], (err, result) => {
@@ -181,7 +208,7 @@ const statusHandlers = {
                         self.emit(':tellWithCard', speechOutput, cardTitle, cardContent);
                     });
                 });
-            // });
+            });
         });
     }
 };
