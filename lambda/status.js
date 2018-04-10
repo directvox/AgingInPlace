@@ -12,62 +12,101 @@ const pool = new pg.Pool({
     port: config.dbPort
 });
 
+
+var userID;
+var intentObj;
+var cCode;
+var timeZone;
 var dates = [];  // moments of the 7 dates.
 var datesStrings = [];  // strings of 7 dates.
 
 
-const statusHandlers = {    
+const statusHandlers = {
+    'MultiRelReport': function () {
+        var self = this;
+        userID = this.event.session.user.userId;
+        intentObj = this.event.request.intent;
+        pool.connect().then(client => {
+            return client.query("SELECT * FROM ccode_rel_view WHERE care_id = $1", [userID])
+            .then(result => {
+                if (result.rows.length > 1) {
+                    if (intentObj.slots.ccode.confirmationStatus !== 'CONFIRMED'){
+                        if (intentObj.slots.ccode.confirmationStatus !== 'DENIED'){
+                            const slotToConfirm = 'ccode';
+                            const speechOutput = "You've told me your code is. "+intentObj.slots.ccode.value.split('').join('. ')+". Is this correct?";
+                            const repromptSpeech = speechOutput;
+                            const cardTitle = "Your caregiver code:";
+                            cCode = intentObj.slots.ccode.value.toString();
+                            const cardContent = code;
+                            console.log("userID: "+ userID);
+                            console.log(intentObj);
+                            console.log(intentObj.slots.ccode.value);
+                            this.emit(':confirmSlotWithCard', slotToConfirm, speechOutput, repromptSpeech, cardTitle, cardContent);
+                        } else {
+                            const speechOutput = 'Please repeat your caregiver code.';
+                            const slotToElicit = 'ccode';
+                            this.emit(':elicitSlot', slotToElicit, speechOutput, speechOutput);
+                        }
+                    } else {
+                        cCode = intentObj.slots.ccode.value.toString();
+                        this.emit('CheckCare')
+                    }
+                } else if (result.rows.length == 1) {
+                    cCode = result.rows[0].ccode;
+                    self.emit('KReportIntent');
+                } else {
+                    self.response.speak('Sorry we did not find any seniors related to your account.  Please run Setup Caregiver.');
+                    self.emit(':responseReady');
+                }
+
+            }).catch(err => {
+                console.log(err.stack);
+                self.response.speak('Sorry there was an error.  Please try again.');
+                self.emit(':responseReady');
+            });
+        }).catch(err => {
+            console.log(err.stack);
+            self.response.speak('Sorry there was an error.  Please try again.');
+            self.emit(':responseReady');
+        });
+    },
+    
     'KReportIntent': function () {
-        /* Professional Caregiver (caregivers) - care_id */
-        // - zyxwvutsrqponmlkjihgfedcba9876543210
-        
-        /* Senior (seniors) - id_num */
-        // - event.session.user.userId = amzn1...
-        // - abcdefghijklmnopqrstuvwxyz0123456789
-        // - ccode = what Caregiver tells Alexa to reference that Senior = 96kka9/etc.
-        
-        const self = this;
+        var self = this;
 
         // User ID
-        var userID = this.event.session.user.userId;
+        userID = this.event.session.user.userId;
         console.log('Current userID: ' + userID);
-
-        // Number of days for Status Report
-        var report_days = 7;
-        var day_number = 7;
         
         pool.connect((err, client, release) => {
             if (err) {
                 return console.error('Error acquiring client', err.stack);
+                self.response.speak('Sorry there was an error.  Please try again.');
+                self.emit(':responseReady');
             }
             
-            // /* SENIORS */
-            // // Gets all rows in SENIORS table
-            // client.query("SELECT * FROM seniors", (err, result) => {
-            //     if (err) {
-            //         return console.error('Error executing query', err.stack);
-            //     }
-                
-            //     console.log('SENIORS Rows: ' + result.rows);
-                
-            //     /* The ID Num of the Senior */
-            //     var senior_id_num = result.rows[0].id_num;
-                
-                /* MOODS */
-                // Currently hardcoded to match the results of that id_num in MOODS table
-                var senior_id_num = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            client.query("SELECT * FROM ccode_rel_view WHERE ccode = $1", [cCode], (err, result) => {
+                if (err) {
+                    return console.error('Error executing query', err.stack);
+                    self.response.speak('Sorry there was an error.  Please try again.');
+                    self.emit(':responseReady');
+                }
+
+                var senior_id_num = result.rows[0].id_num;
 
                 // Gets all Moods expressed by the Senior in last 7 days
                 client.query("SELECT * FROM senior_mood_view WHERE whenwasit > current_date - interval '7 days' and id_num = $1;", [senior_id_num], (err, result) => {
                     if (err) {
                         return console.error('Error executing query', err.stack);
+                        self.response.speak('Sorry there was an error.  Please try again.');
+                        self.emit(':responseReady');
                     }
 
                     console.log('MOODS Rows Length: ' + result.rows.length);
 
+                    
+                    timeZone = result.rows[0].timezone;
                     createSevenDays();
-
-                    var timeZone = result.rows[0].timezone;
 
                     var mood_when_was_its = [];
                     var mood_values = [];
@@ -77,7 +116,7 @@ const statusHandlers = {
                         var moodsArray = [];
 
                         for (var i = 0; i<result.rows.length; i++) {
-                            var whenwasit = moment(result.rows[i].whenwasit);
+                            var whenwasit = moment(result.rows[i].whenwasit).tz(timeZone);
                             var whenwasitStart = whenwasit.startOf('day');
                             var time = moment(result.rows[i].whenwasit);
                             var moodString = '';
@@ -85,7 +124,7 @@ const statusHandlers = {
                             console.log('Date from DB: ' + whenwasitStart.format('ll'));
                             console.log('Date we are checking with: ' + datesStrings[j]);
                             if (whenwasitStart.isSame(dates[j])) {
-                                timesArray.push(time.tz(timeZone).format('LT'));
+                                timesArray.push(time.format('LT'));
                                 moodString = "Mood Expressed: " + result.rows[i].value + " at ";
                                 moodsArray.push(moodString);
                             }    
@@ -104,9 +143,7 @@ const statusHandlers = {
                         }
                     }
                     
-                    /* CHECK-INS */
-                    // Currently hardcoded to match the results of that id_num in CHECK-INS table
-                    senior_id_num = 'amzn1.ask.account.AE4QHOD72IHWXLYTFLNTXILK6FDNIZ35LJKMKBBLTG5WB3SMWVXOI3OWLO4QCFG6SXZQ64VCL6DTX5SL6RORGXYTCTYPLOXATHYKGHOOJAD2YSTJLAFYGC3GSCYNJWPFH56LYLDUQ2CAUZ5VGPCF6KJKCZDYMNMIB4FDQ2OGJQDZNPR2NQSXLYL5KTFMTXTQ2GYF3EKLJSKLPFQ';
+                    // senior_id_num = 'amzn1.ask.account.AE4QHOD72IHWXLYTFLNTXILK6FDNIZ35LJKMKBBLTG5WB3SMWVXOI3OWLO4QCFG6SXZQ64VCL6DTX5SL6RORGXYTCTYPLOXATHYKGHOOJAD2YSTJLAFYGC3GSCYNJWPFH56LYLDUQ2CAUZ5VGPCF6KJKCZDYMNMIB4FDQ2OGJQDZNPR2NQSXLYL5KTFMTXTQ2GYF3EKLJSKLPFQ';
 
                     // Gets all Check-Ins expressed by the Senior in last 7 days
                     client.query("SELECT * FROM senior_check_view WHERE check_in > current_date - interval '7 days' and id_num = $1;", [senior_id_num], (err, result) => {
@@ -121,12 +158,12 @@ const statusHandlers = {
                             var serviceArray = [];
 
                             for (var i = 0; i<result.rows.length; i++) {
-                                var whenwasit = moment(result.rows[i].check_in);
+                                var whenwasit = moment(result.rows[i].check_in).tz(timeZone);
                                 var whenwasitStart = whenwasit.startOf('day');
                                 var time = moment(result.rows[i].check_in);
                                 var duration = result.rows[i].duration;
                                 var serviceString = '';
-                                var timeString = time.tz(timeZone).format('LT');
+                                var timeString = time.format('LT');
                                 console.log('Date from DB: ' + whenwasitStart.format('ll'));
                                 console.log('Date we are checking with: ' + datesStrings[j]);
                                 if (whenwasitStart.isSame(dates[j])) {
@@ -171,7 +208,7 @@ const statusHandlers = {
                         self.emit(':tellWithCard', speechOutput, cardTitle, cardContent);
                     });
                 });
-            // });
+            });
         });
     }
 };
@@ -181,7 +218,7 @@ function createSevenDays(){  // creates the Seven Dates for the report
     var startDate;
 
     for (var i=6; i>=0; i--){
-        date = moment().subtract(i, 'days');
+        date = moment().tz(timeZone).subtract(i, 'days');
         startDate = date.startOf('day');
         dates.push(startDate);
         console.log("The Date is: "+ startDate.format('ll'));
