@@ -37,11 +37,16 @@ const moodHandlers = {
             .then(result => {
                 if (result.rows[0]){
                     if(intentObj.confirmationStatus !== 'CONFIRMED'){
-                        const speechOutput = 'Is this how you are feeling: ' + moodText + '?';
-                        const cardTitle = 'State Mood Confirmation';
-                        const cardContent = 'Is this how you are feeling ' + moodText + '?';
-                        const repromptSpeech = "So you are feeling " + moodText + ", correct?";
-                        this.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContent);
+                        if(intentObj.confirmationStatus !== 'DENIED'){
+                            const speechOutput = 'Is this how you are feeling: ' + moodText + '?';
+                            const cardTitle = 'State Mood Confirmation';
+                            const cardContent = 'Is this how you are feeling ' + moodText + '?';
+                            const repromptSpeech = "So you are feeling " + moodText + ", correct?";
+                            this.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContent);
+                        } else {
+                            this.response.speak('Okay, no problem. Please input your mood again');
+                            this.emit(':responseReady');  
+                        }
                     } else {
                         moodVal = intentObj.slots.mood.resolutions.resolutionsPerAuthority[0].values[0].value.name;
                         pool.connect((err, client, release) => {
