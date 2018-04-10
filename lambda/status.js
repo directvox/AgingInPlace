@@ -310,7 +310,7 @@ const statusHandlers = {
                             }
                             
                             /* ALEXA */
-                            const cardTitle = 'Grace Care: Status Report';
+                            const cardTitle = 'Status Report';
                             var speechOutput = 'Your Status Report is ready! Please check the Card on your Alexa app!';
                             var cardContent = ''; 
     

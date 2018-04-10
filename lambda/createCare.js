@@ -25,7 +25,7 @@ const careHandlers = {
                 const slotToConfirm = 'ccode';
                 const speechOutput = "You've told me your code is. "+cCare.slots.ccode.value.split('').join('. ')+". Is this correct?";
                 const repromptSpeech = speechOutput;
-                const cardTitle = "Your caregiver code:";
+                const cardTitle = "Your Caregiver Code";
                 code = cCare.slots.ccode.value.toString();
                 const cardContent = code;
                 console.log("userID: "+ userID);

@@ -73,7 +73,7 @@ const checkHandlers = {
 
     'DoCheckIN': function () {
         var self = this;
-        const cardTitle = 'Care Hub: Check In';
+        const cardTitle = 'Check In';
         console.log("userID: "+ userID);
 
         pool.connect().then(client => {
@@ -115,7 +115,7 @@ const checkHandlers = {
     'DoCheckOut': function () {
         var self = this;
         var sid = 0;  //serial id of the check in/out instance
-        const cardTitle = 'Care Hub: Check Out';
+        const cardTitle = 'Check Out';
         console.log("userID: "+ userID);
         pool.connect().then(client => {
             return client.query("SELECT * FROM senior_check_view WHERE service_name = $1 AND id_num= $2 ORDER BY serial_id DESC", [serviceName, userID])
