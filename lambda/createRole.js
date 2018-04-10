@@ -23,7 +23,7 @@ const AlexaDeviceAddressClient = require('./AlexaDeviceAddressClient');
 
 const ADDRESS_PERMISSION = "read::alexa:device:all:address:country_and_postal_code";  //Only assk for Country and PostalCode
 const NOTIFY_MISSING_PERMISSIONS = "Please enable Location permissions in the Amazon Alexa app.";
-const NO_ADDRESS = "It looks like you don't have an address set. You can set your address from the companion app.";
+const NO_ADDRESS = "It appears you have not set your country and postal code in your Alexa app, please do so and try again.";
 const LOCATION_FAILURE = "There was an error retrieving your location. Please try Setup Senior again.";
 const ERROR = "Uh Oh. Looks like something went wrong.";
 const PERMISSIONS = [ADDRESS_PERMISSION];
@@ -45,8 +45,6 @@ const creatingHandlers = {
       consentToken = self.event.context.System.apiAccessToken;
       if(!consentToken) {
         self.emit(":tellWithPermissionCard", NOTIFY_MISSING_PERMISSIONS, PERMISSIONS);
-
-        // Lets terminate early since we can't do anything else.
         console.log("User did not give us permissions to access their address.");
         console.info("Ending ConfirmCreate");
         return;
@@ -72,7 +70,7 @@ const creatingHandlers = {
             case 204:
                 // This likely means that the user didn't have their address set via the companion app.
                 console.log("Successfully requested from the device address API, but no address was returned.");
-                self.emit(":tell", NO_ADDRESS);
+                self.emit(':tellWithCard', NO_ADDRESS, 'Address Missing', NO_ADDRESS);
                 break;
             case 403:
                 console.log("The consent token we had wasn't authorized to access the user's address.");
@@ -134,7 +132,7 @@ const creatingHandlers = {
             .then(result => {
                 console.log(testRes);
                 if(findID(result, userID)) {
-                    self.emit(':tellWithCard', 'Senior setup has already been run on this device. Please look at the alexa app to see your caregiver code.', 'Ccode Value', "This is your the caregiver code: " + token);
+                    self.emit(':tellWithCard', 'Senior setup has already been run on this device. Please look at the alexa app to see your caregiver code.', 'Caregiver Code', "This is your the caregiver code: " + token);
                 } else {
                     while(testRes){
                         if(findCC(result, token)){
@@ -146,7 +144,7 @@ const creatingHandlers = {
                                 .then(result => {
                                     client.release();
                                     console.log("Token success: "+ token);
-                                    self.emit(':tellWithCard', 'Senior setup has been completed. Please look at the alexa app to see your caregiver code.', 'Ccode Value', "This is your the caregiver code: "+token);
+                                    self.emit(':tellWithCard', 'Senior setup has been completed. Please look at the alexa app to see your caregiver code.', 'Caregiver Code', "This is your the caregiver code: "+token);
                                     testRes = false;
                                 }).catch(err => {
                                     console.log(err.stack);
