@@ -107,20 +107,26 @@ const creatingHandlers = {
                         console.log("Timezone ID: ", timeZoneId);
                         const d = new moment();
                         if(intentObj.confirmationStatus !== 'CONFIRMED'){
-                            const speechOutput = 'Are you sure you want to setup senior account?';
-                            const cardTitle = 'Setup Senior Confirmation';
-                            const cardContnet = 'Are you sure you want to setup senior account?'
-                            const repromptSpeech = speechOutput;
-                            self.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContnet);
-                        } else {
+                            if(intentObj.confirmationStatus !== 'DENIED'){
+                                const speechOutput = 'Are you sure you want to setup senior account?';
+                                const cardTitle = 'Setup Senior Confirmation';
+                                const cardContent = 'Are you sure you want to setup senior account?';
+                                const repromptSpeech = speechOutput;
+                                this.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContent);
+                            } else {
+                                this.response.speak('Okay, good bye.');
+                                this.emit(':responseReady'); 
+                            }}
+                        else {
                             self.emit('CreateRole')
                         }
                     }).catch(function(err){console.log(err)});
             }).catch((err) => {
                 this.response.speak('I\'m sorry. Something went wrong.');
-            this.emit(':responseReady');
-            console.log(error.message);
-        });
+                this.emit(':responseReady');
+                console.log(error.message);
+            }
+        );
     },
 
     'CreateRole': function () {
@@ -132,7 +138,10 @@ const creatingHandlers = {
             .then(result => {
                 console.log(testRes);
                 if(findID(result, userID)) {
-                    self.emit(':tellWithCard', 'Senior setup has already been run on this device. Please look at the alexa app to see your caregiver code.', 'Caregiver Code', "This is your the caregiver code: " + token);
+                    const speechOutput = 'Senior setup has already been run on this device. Please look at the alexa app to see your caregiver code.';
+                    const cardTitle = 'Caregiver Code';
+                    const cardContent = "This is your the caregiver code: " + token;
+                    self.emit(':tellWithCard', speechOutput, cardTitle, cardContent);
                 } else {
                     while(testRes){
                         if(findCC(result, token)){
@@ -144,7 +153,10 @@ const creatingHandlers = {
                                 .then(result => {
                                     client.release();
                                     console.log("Token success: "+ token);
-                                    self.emit(':tellWithCard', 'Senior setup has been completed. Please look at the alexa app to see your caregiver code.', 'Caregiver Code', "This is your the caregiver code: "+token);
+                                    const speechOutput = 'Senior setup has been completed. Please look at the alexa app to see your caregiver code.';
+                                    const cardTitle = 'Caregiver Code';
+                                    const cardContent = "This is your the caregiver code: " + token;
+                                    self.emit(':tellWithCard', speechOutput, cardTitle, cardContent);
                                     testRes = false;
                                 }).catch(err => {
                                     console.log(err.stack);
