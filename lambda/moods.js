@@ -22,9 +22,9 @@ const moodHandlers = {
         
         var self = this;
         //use this for live
-        //var usrID = this.event.session.user.userId;
+        var usrID = this.event.session.user.userId;
         //use this for testing
-        var usrID = "abcdefghijklmnopqrstuvwxyz0123456789";
+        //var usrID = "abcdefghijklmnopqrstuvwxyz0123456789";
 
         const intentObj = this.event.request.intent;
         //moodVal is used to put the actual slot value in to the DB ie Happy, Neutral, Sad
