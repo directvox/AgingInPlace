@@ -112,18 +112,18 @@ const creatingHandlers = {
                                 const cardTitle = 'Setup Senior Confirmation';
                                 const cardContent = 'Are you sure you want to setup senior account?';
                                 const repromptSpeech = speechOutput;
-                                this.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContent);
+                                self.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContent);
                             } else {
-                                this.response.speak('Okay, good bye.');
-                                this.emit(':responseReady'); 
+                                self.response.speak('Okay, good bye.');
+                                self.emit(':responseReady'); 
                             }}
                         else {
                             self.emit('CreateRole')
                         }
                     }).catch(function(err){console.log(err)});
             }).catch((err) => {
-                this.response.speak('I\'m sorry. Something went wrong.');
-                this.emit(':responseReady');
+                self.response.speak('I\'m sorry. Something went wrong.');
+                self.emit(':responseReady');
                 console.log(error.message);
             }
         );
