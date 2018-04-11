@@ -140,7 +140,7 @@ const creatingHandlers = {
                 if(findID(result, userID)) {
                     const speechOutput = 'Senior setup has already been run on this device. Please look at the alexa app to see your caregiver code.';
                     const cardTitle = 'Caregiver Code';
-                    const cardContent = "This is your the caregiver code: " + token;
+                    const cardContent = "This is your caregiver code: " + token;
                     self.emit(':tellWithCard', speechOutput, cardTitle, cardContent);
                 } else {
                     while(testRes){
@@ -155,7 +155,7 @@ const creatingHandlers = {
                                     console.log("Token success: "+ token);
                                     const speechOutput = 'Senior setup has been completed. Please look at the alexa app to see your caregiver code.';
                                     const cardTitle = 'Caregiver Code';
-                                    const cardContent = "This is your the caregiver code: " + token;
+                                    const cardContent = "This is your caregiver code: " + token;
                                     self.emit(':tellWithCard', speechOutput, cardTitle, cardContent);
                                     testRes = false;
                                 }).catch(err => {
