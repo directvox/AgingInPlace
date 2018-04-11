@@ -12,9 +12,9 @@ const pool = new pg.Pool({
 });
 
 const cardMoods = {
-    happy: 'https://i.imgur.com/We7OlAD.png',
-    neutral: 'https://i.imgur.com/0de3NQz.png',
-    sad: 'https://i.imgur.com/w0YWq8n.png'
+    happy: 'https://s3.amazonaws.com/emoji.pictures/happy.png',
+    neutral: 'https://s3.amazonaws.com/emoji.pictures/neutral.png',
+    sad: 'https://s3.amazonaws.com/emoji.pictures/sad.png'
 }
 
 const moodHandlers = {
@@ -42,10 +42,10 @@ const moodHandlers = {
                             const cardTitle = 'State Mood Confirmation';
                             const cardContent = 'Is this how you are feeling ' + moodText + '?';
                             const repromptSpeech = "So you are feeling " + moodText + ", correct?";
-                            this.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContent);
+                            self.emit(':confirmIntentWithCard', speechOutput, repromptSpeech, cardTitle. cardContent);
                         } else {
-                            this.response.speak('Okay, no problem. Please input your mood again');
-                            this.emit(':responseReady');  
+                            self.response.speak('Okay, no problem. Please input your mood again');
+                            self.emit(':responseReady');  
                         }
                     } else {
                         moodVal = intentObj.slots.mood.resolutions.resolutionsPerAuthority[0].values[0].value.name;
