@@ -1,0 +1,407 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "grace care",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "CheckIn",
+                    "slots": [
+                        {
+                            "name": "Service",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "{Service} checking in",
+                        "{Service} is here",
+                        "{Service} is checking in",
+                        "{Service} has checked in"
+                    ]
+                },
+                {
+                    "name": "ConfirmCreate",
+                    "slots": [],
+                    "samples": [
+                        "Create senior.",
+                        "Creating senior.",
+                        "Assign this as senior.",
+                        "Assign this device as senior.",
+                        "Setup senior."
+                    ]
+                },
+                {
+                    "name": "CreateCare",
+                    "slots": [
+                        {
+                            "name": "ccode",
+                            "type": "AMAZON.SearchQuery",
+                            "samples": [
+                                "it's {ccode}",
+                                "the code is {ccode}",
+                                "{ccode} is my code",
+                                "My code is {ccode}",
+                                "{ccode}",
+                                "My caregiver code is {ccode}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "setup caregiver the code is {ccode}",
+                        "setup caregiver {ccode}"
+                    ]
+                },
+                {
+                    "name": "CreateRole",
+                    "slots": [],
+                    "samples": []
+                },
+                {
+                    "name": "InputMood",
+                    "slots": [
+                        {
+                            "name": "mood",
+                            "type": "Moods"
+                        }
+                    ],
+                    "samples": [
+                        "I am feeling {mood}",
+                        "I am feeling {mood} today"
+                    ]
+                },
+                {
+                    "name": "KReportIntent",
+                    "slots": [],
+                    "samples": [
+                        "status report"
+                    ]
+                },
+                {
+                    "name": "OutCheck",
+                    "slots": [
+                        {
+                            "name": "Service",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "{Service} checking out",
+                        "{Service} has checked out",
+                        "{Service} checked out",
+                        "{Service} is checking out",
+                        "{Service} is done",
+                        "{Service} is leaving"
+                    ]
+                },
+                {
+                    "name": "MultiRelReport",
+                    "slots": [
+                        {
+                            "name": "ccode",
+                            "type": "AMAZON.SearchQuery",
+                            "samples": [
+                                "it's {ccode}",
+                                "my caregiver code is {ccode}",
+                                "{ccode} is my code",
+                                "the code is {ccode}",
+                                "my code is {ccode}",
+                                "{ccode}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "status report {ccode}"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "Moods",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "Happy",
+                                "synonyms": [
+                                    "good",
+                                    "pretty good",
+                                    "tickled pink",
+                                    "peppy",
+                                    "on cloud nine",
+                                    "mirthful",
+                                    "light",
+                                    "jolly",
+                                    "intoxicated",
+                                    "gratified",
+                                    "gleeful",
+                                    "flying high",
+                                    "exultant",
+                                    "convival",
+                                    "content",
+                                    "chirpy",
+                                    "chipper",
+                                    "captivated",
+                                    "can't complain",
+                                    "blithe",
+                                    "blissful",
+                                    "blest",
+                                    "blessed",
+                                    "upbeat",
+                                    "thrilled",
+                                    "pleasant",
+                                    "peaceful",
+                                    "overyjoyed",
+                                    "merry",
+                                    "sunny",
+                                    "sparkling",
+                                    "playful",
+                                    "perky",
+                                    "lively",
+                                    "jubilant",
+                                    "joyous",
+                                    "joyful",
+                                    "glad",
+                                    "elated",
+                                    "ecstatic",
+                                    "delighted",
+                                    "contented",
+                                    "Cheerful"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Sad",
+                                "synonyms": [
+                                    "weeping",
+                                    "troubled",
+                                    "pensive",
+                                    "morose",
+                                    "morbid",
+                                    "low-spirited",
+                                    "low",
+                                    "in grief",
+                                    "hurting",
+                                    "heartsick",
+                                    "grieved",
+                                    "glum",
+                                    "gloomy",
+                                    "down",
+                                    "distressed",
+                                    "despared",
+                                    "dejected",
+                                    "cheerless",
+                                    "blue",
+                                    "wistful",
+                                    "sorry",
+                                    "sorrowful",
+                                    "somber",
+                                    "pessimistic",
+                                    "mournful",
+                                    "melancholy",
+                                    "heartbroken",
+                                    "dismal",
+                                    "bitter"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Neutral",
+                                "synonyms": [
+                                    "okay",
+                                    "easy",
+                                    "middle-of-raod",
+                                    "nonchalant",
+                                    "unaligned",
+                                    "on the fence",
+                                    "bystanding",
+                                    "aloof",
+                                    "cool",
+                                    "calm",
+                                    "uninvolved",
+                                    "undecided",
+                                    "uncommitted",
+                                    "unbiased",
+                                    "nonpartisan",
+                                    "nonaligned",
+                                    "indifferent",
+                                    "inactive",
+                                    "fair-minded",
+                                    "evenhanded",
+                                    "disinterested"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "dialog": {
+            "intents": [
+                {
+                    "name": "CheckIn",
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent-CheckIn"
+                    },
+                    "slots": [
+                        {
+                            "name": "Service",
+                            "type": "AMAZON.SearchQuery",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {}
+                        }
+                    ]
+                },
+                {
+                    "name": "ConfirmCreate",
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent-ConfirmCreate"
+                    },
+                    "slots": []
+                },
+                {
+                    "name": "CreateCare",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "ccode",
+                            "type": "AMAZON.SearchQuery",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.1073870376510.945860895001"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "OutCheck",
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent.987202060790"
+                    },
+                    "slots": [
+                        {
+                            "name": "Service",
+                            "type": "AMAZON.SearchQuery",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {}
+                        }
+                    ]
+                },
+                {
+                    "name": "KReportIntent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": []
+                },
+                {
+                    "name": "MultiRelReport",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "ccode",
+                            "type": "AMAZON.SearchQuery",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.920693819132.738184581027"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "prompts": [
+            {
+                "id": "Confirm.Intent-CheckIn",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "You are checking in?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent-ConfirmCreate",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Are you sure you want to setup senior account?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent-CreateCare",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Are you sure you want to set up a caregiver?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.1073870376510.945860895001",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "What is your caregiver code?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.1421434303610.578421653058",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "{Service} is here"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.987202060790",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "You are checking out?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.492997262711.751271639963",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "What is your caregiver code?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.920693819132.738184581027",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "What is your caregiver code?"
+                    }
+                ]
+            }
+        ]
+    }
+}

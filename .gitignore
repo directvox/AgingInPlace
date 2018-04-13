@@ -1,9 +1,6 @@
 # macOS
 *.DS_Store
 
-# Workbench-Build123
-Workbench-Build123/*
-
 # .zips
 *.zip
 
@@ -71,3 +68,6 @@ typings/
 
 #Jet Brains stuff
 .idea
+
+#Zip files
+.zip

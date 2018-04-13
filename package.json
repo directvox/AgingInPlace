@@ -15,9 +15,8 @@
     "Skill",
     "Seniors",
     "Homecare",
-    "Whimmy",
-    "Wham",
-    "Wazzle"
+    "Grace",
+    "Care"
   ],
   "author": "Brett Dixon, Alex Christensen, Daniel Kole, Kelvin Lau, Abraham Al Jundi",
   "license": "ISC",
@@ -28,6 +27,7 @@
   "dependencies": {
     "alexa-sdk": "^1.0.25",
     "axios": "^0.18.0",
+    "https": "^1.0.0",
     "moment": "^2.21.0",
     "moment-timezone": "^0.5.14",
     "pg": "^7.4.1"
