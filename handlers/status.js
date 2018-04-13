@@ -121,13 +121,13 @@ const statusHandlers = {
                             for (var i = 0; i<result.rows.length; i++) {
                                 var whenwasit = moment(result.rows[i].whenwasit).tz(timeZone);
                                 var whenwasitStart = whenwasit.startOf('day');
-                                var time = moment(result.rows[i].whenwasit);
+                                var time = moment(result.rows[i].whenwasit).tz(timeZone);
                                 var moodString = '';
     
                                 console.log('Date from DB: ' + whenwasitStart.format('ll'));
                                 console.log('Date we are checking with: ' + datesStrings[j]);
                                 if (whenwasitStart.isSame(dates[j])) {
-                                    timesArray.push(time.format('LT'));
+                                    timesArray.push(time.format('LT z'));
                                     moodString = "Mood Expressed: " + result.rows[i].value + " at ";
                                     moodsArray.push(moodString);
                                 }    
@@ -166,7 +166,7 @@ const statusHandlers = {
                                     var time = moment(result.rows[i].check_in);
                                     var duration = result.rows[i].duration;
                                     var serviceString = '';
-                                    var timeString = time.format('LT');
+                                    var timeString = time.tz(timeZone).format('LT z');
                                     console.log('Date from DB: ' + whenwasitStart.format('ll'));
                                     console.log('Date we are checking with: ' + datesStrings[j]);
                                     if (whenwasitStart.isSame(dates[j])) {
