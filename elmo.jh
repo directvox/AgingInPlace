@@ -1,0 +1,139 @@
+
+
+enum StatutDemande
+{
+    ENCOURS, TERMINE, REFUSE, ATTENTE, ANNULE
+}
+
+enum TypeConsentement {
+    DEMANDE, DSQ
+}
+enum Language {
+    FRANCAIS, ANGLAIS
+}
+enum Priorite {
+    URGENT, IMPORTANT, NORMAL, INCONNU
+}
+enum Modalite {
+    DIFERE, REEL, REEL_AVEC_PATIENT
+}
+enum TypeActivite {
+    DISCUSSION, DEMANDE_OPINION, TELECONSULTATION, DEMANDE_DE_TRANSFERT
+}
+entity SpecClinique {
+   nomSpecialiteClinique String required
+}
+
+entity DemandeDeService {
+statut StatutDemande
+dateCreationDemande ZonedDateTime required
+lanque Language required
+priorite Priorite required
+modalite Modalite required
+
+typeActivite TypeActivite required
+
+}
+entity AttachementDemandeDeService {
+nom String
+fichier ImageBlob
+refExterne String
+note TextBlob 
+}
+relationship ManyToMany {
+	DemandeDeService{formulaireEvaluation(idFormulaire)} to FormulaireEvaluation{demandeDeService}
+}
+
+relationship ManyToOne {
+	DemandeDeService{ensembre} to DemandeDeService
+}
+relationship ManyToOne {
+	Destinataire{ensembreDestinataire} to Intervenant
+}
+entity Patient {
+	/**
+	* The firstname attribute.
+	*/
+	firstName String,
+	lastName String,
+	email String,
+	phoneNumber String,
+}
+entity Destinataire {
+id String required
+nomDestinataire String
+}
+entity Intervenant {
+	/**
+	* The firstname attribute.
+	*/
+	firstName String,
+	lastName String,
+	email String,
+	phoneNumber String,
+}
+entity FormulaireEvaluation {
+typeFormulaire String
+
+}
+relationship ManyToOne {
+	SpecClinique{specialite} to FormulaireEvaluation
+}
+relationship ManyToMany {
+	Destinataire{specClinique(id)} to SpecClinique{destinataire}
+}
+
+
+entity FormulaireConsentement {
+idFormulaire String 
+nomFormulaire String
+dateFormulaire String
+actif Boolean
+formulaireConsentementTexte TextBlob 
+formulaireConsentementPDF ImageBlob 
+formulaireConsentementURL String
+}
+entity Consentement {
+typeConsentement TypeConsentement required
+dateConsentement ZonedDateTime required
+consentementRecherche Boolean required
+consentementPDF ImageBlob required
+dateSupprimerConsentement ZonedDateTime
+}
+entity ReponseDemandeDeService {
+dateReponse ZonedDateTime required
+}
+relationship OneToOne {
+	DemandeDeService{patient} to Patient
+}
+
+relationship OneToOne {
+	Consentement{patient} to Patient
+}
+relationship OneToOne {
+	FormulaireConsentement{consentement} to Consentement
+}
+relationship OneToOne {
+	DemandeDeService{destinataire} to Destinataire
+}
+relationship OneToOne {
+	ReponseDemandeDeService{demandeDeService} to DemandeDeService
+}  
+relationship OneToOne {
+	DemandeDeService{specialiteClinique} to SpecClinique
+}
+relationship OneToOne {
+	AttachementDemandeDeService{ref} to DemandeDeService
+}
+// Set pagination options
+paginate SpecClinique, DemandeDeService with infinite-scroll
+paginate Patient with pagination
+
+// Use Data Transfert Objects (DTO)
+// dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl except Employee, Job
+
+// Set an angular suffix
+// angularSuffix * with mySuffix
